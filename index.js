@@ -46,6 +46,7 @@ function runWebpack(webpackConfig) {
 function config(webpackConfig) {
   return {
     ...webpackConfig,
+    output: {},
     plugins: [
       ...webpackConfig.plugins,
       new CircularDependencyPlugin({
