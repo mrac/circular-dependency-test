@@ -1,0 +1,32 @@
+{
+  "name": "circular-dependency-test",
+  "version": "0.1.0",
+  "description": "Detects circular dependencies in modules compiled with Webpack",
+  "main": "index.js",
+  "bin": {
+    "circular-dependency-test": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrac/circular-dependency-test.git"
+  },
+  "keywords": [
+    "circural",
+    "dependencies",
+    "webpack",
+    "dependency",
+    "test"
+  ],
+  "author": "Michal Raczkowski",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mrac/circular-dependency-test/issues"
+  },
+  "homepage": "https://github.com/mrac/circular-dependency-test#readme",
+  "dependencies": {
+    "circular-dependency-plugin": "5.0.2"
+  }
+}
