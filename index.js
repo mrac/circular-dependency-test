@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 
 const webpack = require("webpack");
+const util = require("util");
+const exec = util.promisify(require("child_process").exec);
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 
 const args = parseArgs(process.argv);
 const webpackConfigPath = args.config || "webpack.config.js";
 const excludeRegExp = new RegExp(args.exclude || "node_modules");
+const includeTimestamp = "timestamp" in args;
 
 const cwd = process.cwd();
 const webpackConfig = require(cwd + "/" + webpackConfigPath);
@@ -35,12 +38,12 @@ function output(err, stats) {
   if (err || stats.hasErrors()) {
     const fileMap = {};
     const errors = stats.toJson().errors;
-    let fileCount;
 
     errors.forEach(error => {
       const files = error
         .replace("Circular dependency detected:", "")
-        .split(" -> ");
+        .trim()
+        .split(/ +-> +/);
       files.forEach(file => {
         fileMap[file] = (fileMap[file] || 0) + 1;
       });
@@ -48,16 +51,23 @@ function output(err, stats) {
       console.log("\x1b[31m%s\x1b[0m", error);
     });
 
-    fileCount = Object.keys(fileMap).length;
+    const filePaths = Object.keys(fileMap);
 
     console.log("");
     console.log(
       "\x1b[31m%s\x1b[0m",
       `DETECTED ${errors.length} CIRCULAR-DEPENDENCY ISSUES.`
     );
-    console.log("\x1b[31m%s\x1b[0m", `INVOLVED ${fileCount} FILES.`);
+    console.log("\x1b[31m%s\x1b[0m", `INVOLVED ${filePaths.length} FILES.`);
     console.log("");
-    process.exit(1);
+
+    if (args.image) {
+      createGraph(filePaths).then(() => {
+        process.exit(1);
+      });
+    } else {
+      process.exit(1);
+    }
   } else {
     console.log("");
     console.log("\x1b[32m%s\x1b[0m", "No circular dependencies detected.");
@@ -76,4 +86,42 @@ function parseArgs(argv) {
     }
   });
   return args;
+}
+
+async function createGraph(filePaths) {
+  const pathReg = filePaths.map(f => `.*${f}`.replace(/\./g, "\\.")).join("|");
+  const excludeReg = `^(?!${pathReg})([\\.A-Za-z0-9/_-]+)$`;
+
+  const imagePath = includeTimestamp
+    ? args.image.replace(
+        /(\.png|\.gif|\.jpg|\.jpeg|\.jp2|\.bmp|\.svg|\.pdf)?$/,
+        "-$(date +%Y%m%d-%H%M%S)$1"
+      )
+    : args.image;
+
+  const imageType = args.format || "gif";
+
+  const realImagePath = (await exec(`echo ${imagePath}`)).stdout;
+
+  const { stdout, stderr } = await exec(
+    `node ./node_modules/dependency-cruiser/bin/dependency-cruise -T dot -x 'node_modules|${excludeReg}' ${
+      filePaths[0]
+    } | dot -T ${imageType} > ${realImagePath}`
+  );
+
+  const errorStd = stderr
+    .split(/\n/)
+    .filter(line => {
+      return !line.match("CoreText performance note:");
+    })
+    .join("\n")
+    .trim();
+
+  if (errorStd) {
+    console.log("Error from dependency-cruise:\n", errorStd);
+  } else {
+    const cyan = "\x1b[36m%s\x1b[0m";
+    const graphUrl = "file://" + cwd + "/" + realImagePath;
+    console.log("\nDependency graph: " + cyan, graphUrl + "\n");
+  }
 }
