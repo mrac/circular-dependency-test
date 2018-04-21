@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const webpack = require('webpack');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 
