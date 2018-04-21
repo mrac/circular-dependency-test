@@ -50,7 +50,7 @@ circular-dependency-test --config=config/my-webpack.config.js
 
 ### exclude
 
-Regular expression to exclude files from dependency test. By default dependencies from `node_modules` are excluded.
+Sets regular expression to exclude files from dependency test. By default it is `node_modules`. To overwrite it by your custom RegExp run:
 
 ```regexp
 circular-dependency-test --exclude='.+\\.types\\.ts|node_modules'
