@@ -13,10 +13,24 @@ runWebpack(webpackConfig);
 function runWebpack(webpackConfig) {
   webpack(config(webpackConfig)).run((err, stats) => {
     if (err || stats.hasErrors()) {
-      stats.toJson().errors.forEach(error => {
+      const fileMap = {};
+      const errors = stats.toJson().errors;
+      let fileCount;
+
+      errors.forEach(error => {
+        const files = error.replace('Circular dependency detected:', '').split(' -> ');
+        files.forEach(file => {
+          fileMap[file] = (fileMap[file] || 0) + 1;
+        });
         console.log('');
         console.log('\x1b[31m%s\x1b[0m', error);
       });
+
+      fileCount = Object.keys(fileMap).length;
+
+      console.log('');
+      console.log('\x1b[31m%s\x1b[0m', `DETECTED ${errors.length} CIRCULAR-DEPENDENCY ISSUES.`);
+      console.log('\x1b[31m%s\x1b[0m', `INVOLVED ${fileCount} FILES.`);
       console.log('');
       process.exit(1);
     } else {
