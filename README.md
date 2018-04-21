@@ -37,7 +37,7 @@ For custom webpack config path:
 Then run:
 
 ```
-npm run dependency-test
+npm run test:dependency
 ```
 
 ## exclude files
