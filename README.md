@@ -9,7 +9,7 @@ Detects circular dependencies in modules compiled with Webpack.
 ## install
 
 ```
-npm install --save-dev git+https://github.com/mrac/circular-dependency-test
+npm install --save-dev circular-dependency-test
 ```
 
 ## run
