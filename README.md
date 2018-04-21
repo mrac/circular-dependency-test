@@ -4,8 +4,14 @@ Detects circular dependencies in modules compiled with Webpack.
 
 ## install
 
-```
+```sh
 npm install --save-dev circular-dependency-test
+```
+
+or globally:
+
+```sh
+npm install -g circular-dependency-test
 ```
 
 ### Graphviz (optional)
@@ -14,43 +20,22 @@ npm install --save-dev circular-dependency-test
 
 #### Mac OS X
 
-```
+```sh
 brew install graphviz || port install graphviz
 ```
 
 #### Ubuntu
 
-```
+```sh
 apt-get install graphviz
 ```
 
 ## run
 
-If your Webpack config is in `./webpack.config.js` setup a script in `package.json` of your project:
+If your Webpack config is in `./webpack.config.js`, run the test from the root directory of your project:
 
-```json
-{
-  "scripts": {
-    "test:dependency": "circular-dependency-test"
-  }
-}
-```
-
-For custom webpack config path:
-
-```json
-{
-  "scripts": {
-    "test:dependency":
-      "circular-dependency-test --config=config/my-webpack.config.js"
-  }
-}
-```
-
-Then run:
-
-```
-npm run test:dependency
+```sh
+circular-dependency-test
 ```
 
 ## parameters
@@ -59,7 +44,7 @@ npm run test:dependency
 
 Custom path to Webpack config.
 
-```
+```sh
 circular-dependency-test --config=config/my-webpack.config.js
 ```
 
@@ -68,7 +53,7 @@ circular-dependency-test --config=config/my-webpack.config.js
 Regular expression to exclude files from dependency test. By default dependencies from `node_modules` are excluded.
 
 ```regexp
-circular-dependency-test --exclude='.+\.types\.ts|node_modules'
+circular-dependency-test --exclude='.+\\.types\\.ts|node_modules'
 ```
 
 ### image
@@ -77,7 +62,7 @@ Creates dependency graph. Default format is `gif`.
 
 Requires [Graphviz](http://www.graphviz.org/) to be installed.
 
-```
+```sh
 circular-dependency-test --image=reports/dependency-graph.gif
 ```
 
@@ -88,7 +73,7 @@ See all formats: https://graphviz.gitlab.io/_pages/doc/info/output.html
 
 Most common image types: `gif` `png` `svg` `jp2` `jpg` `pdf`
 
-```
+```sh
 circular-dependency-test --image=reports/dependency-graph.svg --format=svg
 ```
 
@@ -96,7 +81,7 @@ circular-dependency-test --image=reports/dependency-graph.svg --format=svg
 
 Saves the image file with a timestamp.
 
-```
+```sh
 circular-dependency-test --image=reports/dependency-graph.gif --timestamp
 ```
 
