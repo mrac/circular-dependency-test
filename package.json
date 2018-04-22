@@ -1,6 +1,6 @@
 {
   "name": "circular-dependency-test",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Detects circular dependencies in modules compiled with Webpack",
   "main": "index.js",
   "bin": {
@@ -28,6 +28,7 @@
   "homepage": "https://github.com/mrac/circular-dependency-test#readme",
   "dependencies": {
     "circular-dependency-plugin": "5.0.2",
-    "dependency-cruiser": "3.1.0"
+    "dependency-cruiser": "3.1.0",
+    "disable-output-webpack-plugin": "1.0.1"
   }
 }

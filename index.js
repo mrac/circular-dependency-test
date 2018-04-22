@@ -4,6 +4,7 @@ const webpack = require("webpack");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const CircularDependencyPlugin = require("circular-dependency-plugin");
+const DisableOutputWebpackPlugin = require("disable-output-webpack-plugin");
 
 const args = parseArgs(process.argv);
 const webpackConfigPath = args.config || "webpack.config.js";
@@ -22,9 +23,9 @@ function runWebpack(webpackConfig) {
 function config(webpackConfig) {
   return {
     ...webpackConfig,
-    output: {},
     plugins: [
       ...webpackConfig.plugins,
+      new DisableOutputWebpackPlugin(),
       new CircularDependencyPlugin({
         exclude: excludeRegExp,
         failOnError: true,
@@ -37,10 +38,10 @@ function config(webpackConfig) {
 function output(err, stats) {
   if (err || stats.hasErrors()) {
     const fileMap = {};
-    const errors = stats.toJson().errors;
+    const errors = stats ? stats.toJson().errors : [err];
 
     errors.forEach(error => {
-      const files = error
+      const files = String(error)
         .replace("Circular dependency detected:", "")
         .trim()
         .split(/ +-> +/);
@@ -53,19 +54,24 @@ function output(err, stats) {
 
     const filePaths = Object.keys(fileMap);
 
-    console.log("");
-    console.log(
-      "\x1b[31m%s\x1b[0m",
-      `DETECTED ${errors.length} CIRCULAR-DEPENDENCY ISSUES.`
-    );
-    console.log("\x1b[31m%s\x1b[0m", `INVOLVED ${filePaths.length} FILES.`);
-    console.log("");
+    if (stats) {
+      console.log("");
+      console.log(
+        "\x1b[31m%s\x1b[0m",
+        `DETECTED ${errors.length} CIRCULAR-DEPENDENCY ISSUES.`
+      );
+      console.log("\x1b[31m%s\x1b[0m", `INVOLVED ${filePaths.length} FILES.`);
+      console.log("");
 
-    if (args.image) {
-      createGraph(filePaths).then(() => {
+      if (args.image) {
+        createGraph(filePaths).then(() => {
+          process.exit(1);
+        });
+      } else {
         process.exit(1);
-      });
+      }
     } else {
+      console.log("");
       process.exit(1);
     }
   } else {
