@@ -84,7 +84,7 @@ function output(err, stats) {
 function parseArgs(argv) {
   const args = {};
   argv.forEach(arg => {
-    const match = arg.match(/--?([^=]+)(=(.*))?/);
+    const match = arg.match(/^--?([^=]+)(=(.*))?$/);
     if (match) {
       const key = match[1];
       const value = match[3];
