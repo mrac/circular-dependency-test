@@ -96,7 +96,7 @@ function parseArgs(argv) {
 
 async function createGraph(filePaths) {
   const pathReg = filePaths.map(f => `.*${f}`.replace(/\./g, "\\.")).join("|");
-  const excludeReg = `^(?!${pathReg})([\\.A-Za-z0-9/_-]+)$`;
+  const excludeReg = `node_modules|^(?!${pathReg})([\\.A-Za-z0-9/_-]+)$`;
 
   const imagePath = includeTimestamp
     ? args.image.replace(
@@ -106,13 +106,11 @@ async function createGraph(filePaths) {
     : args.image;
 
   const imageType = args.format || "gif";
-
   const realImagePath = (await exec(`echo ${imagePath}`)).stdout;
+  const files = filePaths.join(" ");
 
   const { stdout, stderr } = await exec(
-    `node ./node_modules/dependency-cruiser/bin/dependency-cruise -T dot -x 'node_modules|${excludeReg}' ${
-      filePaths[0]
-    } | dot -T ${imageType} > ${realImagePath}`
+    `node ./node_modules/dependency-cruiser/bin/dependency-cruise -T dot -x '${excludeReg}' ${files} | dot -T ${imageType} > ${realImagePath}`
   );
 
   const errorStd = stderr
